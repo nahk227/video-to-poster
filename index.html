@@ -171,6 +171,11 @@ input[type=file]{display:none}
 #logoPick:hover{background:rgba(255,255,255,.35);border-style:solid}
 #logoPick:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 #logoPick.has{border-style:solid}   /* 담겼으면 실선 */
+/* 빼는 버튼은 넣는 버튼보다 조용해야 한다 — 실수로 누르는 자리가 아니다 */
+#logoClear{flex:none;padding:.26rem .7rem;font-size:.78rem;font-weight:700;
+  border:1px solid var(--line);background:transparent;color:var(--soft);
+  cursor:pointer;transition:background .12s,color .12s}
+#logoClear:hover{background:rgba(0,0,0,.07);color:var(--ink);border-color:var(--ink)}
 .logo-row input[type=range]{flex:1 1 auto;min-width:0;accent-color:var(--ink);height:1rem}
 .logo-row .rot-num{width:4.4em;padding:.1rem .3rem;font-size:.8rem}
 .logo-row .chk{display:inline-flex;align-items:center;gap:.22rem;font-size:.78rem;
@@ -287,6 +292,8 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
 .lightbox .lb-meta span{color:rgba(186,217,79,.7);font-size:.82rem;
   font-family:var(--mono)}
 .lightbox .lb-actions{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
+.lb-note{margin:0;min-height:1.2em;color:var(--ground);opacity:.85;font-size:.82rem;
+  text-align:center}
 .lightbox button{border-color:var(--ground);background:var(--ground);color:var(--ink)}
 .lightbox button.ghost{background:transparent;color:var(--ground)}
 .lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:none;
@@ -609,6 +616,8 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
       <div class="logo-head">
         <label for="logoPick">로고</label>
         <button type="button" class="ghost sm" id="logoPick">파일</button>
+        <button type="button" class="sm" id="logoClear" hidden
+                title="로고 빼기">지우기</button>
       </div>
       <select id="logoCorner" aria-label="로고 위치">
         <option value="br" selected>우하단</option>
@@ -696,9 +705,11 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
   <div class="lb-actions">
     <button id="lbSave">PNG 저장</button>
     <button class="ghost" id="lbPdf">PDF 저장</button>
+    <button class="ghost" id="lbInsta">인스타</button>
     <button class="ghost" id="lbReset">이 장 편집 취소</button>
     <button class="ghost" id="lbClose">닫기</button>
   </div>
+  <p class="lb-note" id="lbNote"></p>
   <button class="lb-nav lb-next" id="lbNext" aria-label="다음">›</button>
 </div>
 
@@ -1354,12 +1365,23 @@ $('#logoFile').onchange = () => {
   img.onload = () => {
     BRAND.img = img;
     $('#logoPick').classList.add('has');       // 담겼으면 실선으로
+    $('#logoClear').hidden = false;
     $('#logoHint').textContent =
       `${f.name} · ${img.naturalWidth}×${img.naturalHeight} — 모든 포스터에 들어갑니다.`;
     drawPreview();
   };
   img.onerror = () => { $('#logoHint').textContent = '이 이미지를 읽지 못했습니다.'; };
   img.src = URL.createObjectURL(f);
+};
+
+/* 넣은 로고를 도로 뺀다. 같은 파일을 다시 고를 수 있게 입력칸도 비운다. */
+$('#logoClear').onclick = () => {
+  BRAND.img = null;
+  $('#logoFile').value = '';
+  $('#logoPick').classList.remove('has');
+  $('#logoClear').hidden = true;
+  $('#logoHint').textContent = '투명 배경 PNG 권장. 모든 포스터에 들어갑니다.';
+  drawPreview();
 };
 $('#logoCorner').addEventListener('change', () => {
   BRAND.corner = $('#logoCorner').value; drawPreview();
@@ -2271,6 +2293,7 @@ function openLB(i) {
   lb.width = p.canvas.width; lb.height = p.canvas.height;
   lb.getContext('2d').drawImage(p.canvas, 0, 0);
   ED = p.edit; syncRot();                     // 슬라이더가 이 장을 겨눈다
+  $('#lbNote').textContent = '';              // 앞 장의 안내는 지운다
   $('#lbTitle').textContent = `${p.concept}안 · ${p.layout}`;
   $('#lbSub').textContent =
     `${p.ratio} · ${p.canvas.width}×${p.canvas.height} · ${p.shape} · ${p.t.toFixed(2)}초` +
@@ -2425,6 +2448,50 @@ $('#zipAll').onclick = async () => {
       : '저장하지 못했습니다.';
   }
   $('#zipAll').disabled = false;
+};
+
+/* ---- 인스타 ----
+   인스타는 올린 이미지를 가로 1080 으로 다시 압축한다. 3840px 원본을 그냥 올리면
+   그 압축을 한 번 더 먹어 글자 가장자리가 지저분해진다. 미리 1080 으로 줄여 보낸다.
+   폰에서는 공유 창이 떠 인스타로 바로 넘길 수 있고, 그게 안 되는 곳에서는 파일로 받는다. */
+function instaCanvas(src) {
+  const W = 1080, H = Math.round(1080 * src.height / src.width);
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const cx = c.getContext('2d');
+  cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = 'high';
+  cx.drawImage(src, 0, 0, W, H);
+  return c;
+}
+
+$('#lbInsta').onclick = async () => {
+  const p = posters[lbIndex];
+  if (!p) return;
+  const say = m => { $('#lbNote').textContent = m; };
+  const c = instaCanvas(p.canvas);
+  const name = nameOf(p, lbIndex).replace(/\.png$/, '_insta.jpg');
+  say('인스타 규격으로 만드는 중…');
+  const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.92));
+
+  try {
+    const file = new File([blob], name, { type: 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: '포스터' });
+      say(`${c.width}×${c.height} 로 공유했습니다.`);
+      return;
+    }
+  } catch (e) {
+    if (e && e.name === 'AbortError') { say(''); return; }   // 공유 창을 닫은 것뿐이다
+  }
+
+  const dl = await downloads();
+  if (!dl) { say('이 화면에서는 저장을 쓸 수 없습니다.'); return; }
+  try {
+    await dl.save({ filename: name, data: blob });
+    say(`인스타 규격 ${c.width}×${c.height} 로 저장했습니다. 그대로 올리면 됩니다.`);
+  } catch (e) {
+    say((e && e.code) === 'declined' ? '저장을 취소했습니다.' : '저장하지 못했습니다.');
+  }
 };
 
 $('#pdfAll').onclick = () => savePdf(posters, 'SCENE_posters.pdf');
