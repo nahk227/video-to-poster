@@ -93,20 +93,19 @@ input[type=file]{display:none}
 .pv-ctl{flex:none;display:flex;align-items:center;gap:.55rem;font-size:.8rem;font-weight:600}
 .pv-rows{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:.3rem}
 .pv-row{display:flex;align-items:center;gap:.5rem}
-.pv-row .lbl{flex:none;width:2.4em;color:var(--soft);font-weight:800}
+.pv-row .lbl{flex:none;width:5.4em;color:var(--soft);font-weight:800}
 .pv-row input[type=range]{flex:1 1 auto;min-width:0;accent-color:var(--ink);height:1.1rem}
 /* 장면 · 회전 · 크기 세 줄을 한 격자로 묶는다. 마지막 칸(5열)을 셋이 공유하므로
    '+ 담기' 버튼과 두 숫자 상자의 좌우 끝이 정확히 맞는다. */
 .pv-grid{flex:none;display:grid;gap:.4rem .5rem;align-items:center;
-  grid-template-columns:3.9em 2.4em minmax(0,1fr) 4.6em 5.4em;
+  grid-template-columns:5.4em minmax(0,1fr) 4.6em 5.4em;
   font-size:.8rem;font-weight:600}
 .pv-grid .lbl{color:var(--soft);font-weight:800}
 .pv-grid input[type=range]{width:100%;min-width:0;accent-color:var(--ink);height:1.1rem}
 .pv-grid output{text-align:right;font-variant-numeric:tabular-nums}
-.r1c2{grid-area:1/2} .r1c3{grid-area:1/3} .r1c4{grid-area:1/4} .r1c5{grid-area:1/5}
-.rtgt{grid-area:2/1/4/2;align-self:center;height:100%}
-.r2c2{grid-area:2/2} .r2c3{grid-area:2/3} .r2c5{grid-area:2/5}
-.r3c2{grid-area:3/2} .r3c3{grid-area:3/3} .r3c5{grid-area:3/5}
+.r1c1{grid-area:1/1} .r1c2{grid-area:1/2} .r1c3{grid-area:1/3} .r1c4{grid-area:1/4}
+.r2c1{grid-area:2/1} .r2c2{grid-area:2/2} .r2c4{grid-area:2/4}
+.r3c1{grid-area:3/1} .r3c2{grid-area:3/2} .r3c4{grid-area:3/4}
 .picks{flex:none;display:flex;flex-wrap:wrap;gap:.3rem}
 .pick{font:inherit;font-size:.74rem;font-weight:700;padding:.14rem .42rem;cursor:pointer;
   border:1px solid var(--line);background:rgba(255,255,255,.5);color:inherit;
@@ -203,9 +202,6 @@ textarea:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 .rot-num input:focus{outline:none}
 .rot-num i{font-style:normal;opacity:.6;flex:none}
 .rot-num:focus-within{outline:2px solid var(--ink);outline-offset:1px;background:#fff}
-.rot-target{border:1px solid var(--line);background:transparent;color:inherit;
-  font:inherit;font-weight:700;padding:.16rem .5rem;cursor:pointer;min-width:3.6em}
-.rot-target:hover{background:rgba(0,0,0,.07)}
 .preview .hint{flex:none}
 button.sm{padding:.15rem .55rem;font-size:1rem;line-height:1}
 
@@ -285,8 +281,6 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
 .lb-edit input[type=range]{accent-color:var(--ground)}
 .lb-edit .rot-num{background:rgba(186,217,79,.12);color:var(--ground);
   border-color:rgba(186,217,79,.45);width:5.4em}
-.lb-edit .rot-target{border-color:rgba(186,217,79,.45);color:var(--ground)}
-.lb-edit .rot-target:hover{background:rgba(186,217,79,.16)}
 .lightbox .lb-meta{color:var(--ground);font-size:.95rem;text-align:center;
   display:flex;flex-direction:column;gap:.15rem}
 .lightbox .lb-meta span{color:rgba(186,217,79,.7);font-size:.82rem;
@@ -359,27 +353,24 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
       <div class="picks" id="picks" hidden></div>
       <!-- 세 줄을 한 격자에 넣어야 오른쪽 상자들의 끝이 정확히 맞는다 -->
       <div class="pv-grid">
-        <span class="lbl r1c2">장면</span>
+        <span class="lbl r1c1">장면</span>
         <input type="range" id="scrub" min="0" max="1000" step="1" value="340"
-               class="r1c3" aria-label="영상에서 장면 고르기">
-        <output id="scrubT" class="r1c4">0.00초</output>
-        <button type="button" class="ghost sm r1c5" id="pickAdd">+ 담기</button>
+               class="r1c2" aria-label="영상에서 장면 고르기">
+        <output id="scrubT" class="r1c3">0.00초</output>
+        <button type="button" class="ghost sm r1c4" id="pickAdd">+ 담기</button>
 
-        <button type="button" class="rot-target rtgt" id="rotTarget"
-                title="누르면 메인 ↔ 서브 전환">메인</button>
-
-        <span class="lbl r2c2">회전</span>
+        <span class="lbl r2c1" id="rotTarget">회전</span>
         <input type="range" id="rot" min="0" max="360" step="1" value="0"
-               class="r2c3" aria-label="글자 회전 각도">
-        <span class="rot-num r2c5">
+               class="r2c2" aria-label="글자 회전 각도">
+        <span class="rot-num r2c4">
           <input type="number" id="rotNum" min="-360" max="360" step="1" value="0"
                  inputmode="numeric" aria-label="회전 각도를 숫자로 입력"><i>°</i>
         </span>
 
-        <span class="lbl r3c2">크기</span>
+        <span class="lbl r3c1" id="sclTarget">크기</span>
         <input type="range" id="scl" min="20" max="300" step="1" value="100"
-               class="r3c3" aria-label="글자 크기">
-        <span class="rot-num r3c5">
+               class="r3c2" aria-label="글자 크기">
+        <span class="rot-num r3c4">
           <input type="number" id="sclNum" min="10" max="400" step="1" value="100"
                  inputmode="numeric" aria-label="글자 크기를 숫자로 입력"><i>%</i>
         </span>
@@ -702,12 +693,11 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
   <canvas id="lbCanvas"></canvas>
   <div class="lb-meta"><strong id="lbTitle"></strong><span id="lbSub"></span></div>
   <div class="lb-edit">
-    <button type="button" class="rot-target" id="lbTarget">메인</button>
     <div class="pv-rows">
-      <div class="pv-row"><span class="lbl">회전</span>
+      <div class="pv-row"><span class="lbl" id="lbTarget">회전</span>
         <input type="range" id="lbRot" min="0" max="360" step="1" value="0">
         <span class="rot-num"><input type="number" id="lbRotNum" value="0">°</span></div>
-      <div class="pv-row"><span class="lbl">크기</span>
+      <div class="pv-row"><span class="lbl" id="lbSclTarget">크기</span>
         <input type="range" id="lbScl" min="20" max="300" step="1" value="100">
         <span class="rot-num"><input type="number" id="lbSclNum" value="100">%</span></div>
     </div>
@@ -990,8 +980,10 @@ const wrapDeg = v => ((Math.round(v) % 360) + 360) % 360;   // -30 -> 330, 400 -
 const pctOf = v => Math.round(v * 100);
 
 const CTL = [
-  { rot:'#rot',   rotNum:'#rotNum',   scl:'#scl',   sclNum:'#sclNum',   tgt:'#rotTarget' },
-  { rot:'#lbRot', rotNum:'#lbRotNum', scl:'#lbScl', sclNum:'#lbSclNum', tgt:'#lbTarget'  },
+  { rot:'#rot',   rotNum:'#rotNum',   scl:'#scl',   sclNum:'#sclNum',
+    tgt:'#rotTarget', tgt2:'#sclTarget' },
+  { rot:'#lbRot', rotNum:'#lbRotNum', scl:'#lbScl', sclNum:'#lbSclNum',
+    tgt:'#lbTarget',  tgt2:'#lbSclTarget' },
 ];
 
 /* 슬라이더를 움직이면 지금 앞에 있는 것을 다시 그린다 —
@@ -1004,8 +996,12 @@ function applyEdit(now) {
 
 function syncRot() {
   const deg = ED.rot[SEL], pct = pctOf(ED.scale[SEL]);
+  /* 무엇을 조절 중인지 이름표에 그대로 적는다 — 따로 누를 스위치를 두지 않는다.
+     대상은 미리보기에서 글자를 집으면 바뀐다. */
+  const who = SEL === 'sub' ? '서브 ' : '메인 ';
   for (const c of CTL) {
-    $(c.tgt).textContent = SEL === 'sub' ? '서브' : '메인';
+    $(c.tgt).textContent = who + '회전';
+    $(c.tgt2).textContent = who + '크기';
     $(c.rot).value = deg;
     $(c.rotNum).value = deg;
     $(c.scl).value = pct;
@@ -1049,7 +1045,6 @@ for (const c of CTL) {
     $(id).addEventListener('change', () => { syncRot(); applyEdit(true); });
     $(id).addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
   }
-  $(c.tgt).onclick = () => { SEL = SEL === 'sub' ? 'main' : 'sub'; syncRot(); };
 }
 
 /* ---- 장면 직접 고르기 ----
