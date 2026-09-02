@@ -326,6 +326,19 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
   border:1px solid var(--ink);background:transparent;border-radius:0}
 .ink-pick::-webkit-color-swatch-wrapper{padding:0}
 .ink-pick::-webkit-color-swatch{border:none}
+/* 색 — 이름표 옆의 무지개 테 선택기. 고르면 × 가 나타나 자동으로 되돌릴 수 있다. */
+.ink-lbl{flex:none;font-size:.88rem;font-weight:700;color:var(--soft)}
+.ink-pick{flex:1 1 auto;min-width:0;height:2.1rem;padding:3px;cursor:pointer;
+  border:none;border-radius:0;background:
+    linear-gradient(90deg,#e33,#ec0,#5c3,#2ad,#63c,#e39,#e33);
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.55)}
+.ink-pick::-webkit-color-swatch-wrapper{padding:0}
+.ink-pick::-webkit-color-swatch{border:1px solid rgba(0,0,0,.35)}
+.ink-pick::-moz-color-swatch{border:1px solid rgba(0,0,0,.35)}
+.ink-auto{flex:none;width:1.8rem;height:2.1rem;padding:0;cursor:pointer;line-height:1;
+  border:1px solid var(--line);background:transparent;color:var(--soft);
+  font:inherit;font-weight:700}
+.ink-auto:hover{background:rgba(0,0,0,.07);color:var(--ink);border-color:var(--ink)}
 </style>
 
 <div class="wrap">
@@ -581,18 +594,13 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         </optgroup>
       </select>
         
-        <span class="ink-row"><select id="ink">
-          <option value="">색</option>
-        <option value="auto">자동 — 배경 보고 결정</option>
-        <option value="#F2EFE8">페이퍼 화이트</option>
-        <option value="#161A0D">잉크 블랙</option>
-        <option value="video">영상에서 뽑은 색</option>
-        <option value="#BAD94F">라임</option>
-        <option value="#B0904F">골드</option>
-        <option value="#C0392B">레드</option>
-        <option value="#2255CC">블루</option>
-      </select><input type="color" class="ink-pick" id="inkPick" value="#161A0D"
-                 title="메인 카피 색 직접 고르기" aria-label="메인 카피 색 직접 고르기"></span>
+        <span class="ink-row">
+          <span class="ink-lbl">색</span>
+          <input type="color" class="ink-pick" id="inkPick" value="#161A0D"
+                 title="메인 카피 색 고르기" aria-label="메인 카피 색">
+          <button type="button" class="ink-auto" id="inkAuto" hidden
+                  title="자동으로 되돌리기">&times;</button>
+        </span>
       </div>
     </div>
 
@@ -603,8 +611,13 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         
           <select id="fontSub" aria-label="서브 카피 글꼴"></select>
         
-          <span class="ink-row"><select id="inkSub" aria-label="서브 카피 색"></select><input type="color" class="ink-pick" id="inkSubPick" value="#161A0D"
-                 title="서브 카피 색 직접 고르기" aria-label="서브 카피 색 직접 고르기"></span>
+          <span class="ink-row">
+          <span class="ink-lbl">색</span>
+          <input type="color" class="ink-pick" id="inkSubPick" value="#161A0D"
+                 title="서브 카피 색 고르기" aria-label="서브 카피 색">
+          <button type="button" class="ink-auto" id="inkSubAuto" hidden
+                  title="자동으로 되돌리기">&times;</button>
+        </span>
       </div>
     </div>
 
@@ -616,8 +629,13 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         
           <select id="fontExtra" aria-label="추가 정보 글꼴"></select>
         
-          <span class="ink-row"><select id="inkExtra" aria-label="추가 정보 색"></select><input type="color" class="ink-pick" id="inkExtraPick" value="#161A0D"
-                 title="추가 정보 색 직접 고르기" aria-label="추가 정보 색 직접 고르기"></span>
+          <span class="ink-row">
+          <span class="ink-lbl">색</span>
+          <input type="color" class="ink-pick" id="inkExtraPick" value="#161A0D"
+                 title="추가 정보 색 고르기" aria-label="추가 정보 색">
+          <button type="button" class="ink-auto" id="inkExtraAuto" hidden
+                  title="자동으로 되돌리기">&times;</button>
+        </span>
       </div>
     </div>
   </div>
@@ -799,10 +817,12 @@ let INKS = { main: 'auto', sub: '', extra: '' };
 let CUSTOM = { main: null, sub: null, extra: null };
 
 function readInks() {
+  /* 손대지 않았으면 메인은 자동(배경을 재서 대비가 나오는 쪽),
+     서브·추가는 빈 값이라 메인을 따라간다. */
   INKS = {
-    main: CUSTOM.main || $('#ink').value,
-    sub: CUSTOM.sub || $('#inkSub').value,
-    extra: CUSTOM.extra || $('#inkExtra').value,
+    main: CUSTOM.main || 'auto',
+    sub: CUSTOM.sub || '',
+    extra: CUSTOM.extra || '',
   };
   INK = INKS.main;
 }
@@ -1384,18 +1404,19 @@ function mixPool(refs, base) {
      그대로 두면 서브·추가는 메인 설정을 따라간다. */
   $('#fontSub').innerHTML = $('#font').innerHTML;
   $('#fontExtra').innerHTML = $('#font').innerHTML;
-  $('#inkSub').innerHTML = $('#ink').innerHTML;
-  $('#inkExtra').innerHTML = $('#ink').innerHTML;
   for (const s of ['#fontSub', '#fontExtra'])
     $(s).addEventListener('change', async () => { await loadFont(); drawPreview(); });
   const ROLE = { ink: 'main', inkSub: 'sub', inkExtra: 'extra' };
   for (const id of ['ink', 'inkSub', 'inkExtra']) {
-    $('#' + id).addEventListener('change', () => {
-      CUSTOM[ROLE[id]] = null;            // 목록에서 골랐으면 직접 고른 색은 버린다
+    const pick = $('#' + id + 'Pick'), auto = $('#' + id + 'Auto');
+    pick.addEventListener('input', () => {
+      CUSTOM[ROLE[id]] = pick.value;
+      auto.hidden = false;
       readInks(); queuePreview();
     });
-    $('#' + id + 'Pick').addEventListener('input', () => {
-      CUSTOM[ROLE[id]] = $('#' + id + 'Pick').value;
+    auto.addEventListener('click', () => {
+      CUSTOM[ROLE[id]] = null;            // 자동으로 되돌린다
+      auto.hidden = true;
       readInks(); queuePreview();
     });
   }
