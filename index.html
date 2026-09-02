@@ -348,6 +348,9 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
   border:1px solid var(--line);background:transparent;color:var(--soft);
   font:inherit;font-weight:700}
 .ink-auto:hover{background:rgba(0,0,0,.07);color:var(--ink);border-color:var(--ink)}
+/* 한글과 영문을 가르는 줄 — 고를 수 없는 항목이다 */
+option.fdiv{font-weight:800;letter-spacing:.08em;text-align:center;
+  background:var(--pick-on);color:var(--pick-ink);font-family:var(--mono)}
 </style>
 
 <div class="wrap">
@@ -445,7 +448,7 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         <select id="font">
           <option value="">글꼴</option>
         <optgroup label="고딕">
-          <option value='"Noto Sans KR"' data-w="900">노토 산스 — 기본</option>
+          <option value='"Noto Sans KR"' data-w="900">노토 산스</option>
           <option value='"Nanum Gothic"' data-w="800">나눔고딕</option>
           <option value='"Gothic A1"' data-w="900">고딕 A1</option>
           <option value='"IBM Plex Sans KR"' data-w="700">IBM 플렉스 산스</option>
@@ -454,16 +457,16 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         </optgroup>
         <optgroup label="명조 · 세리프">
           <option value='"Noto Serif KR"' data-w="900">노토 세리프</option>
-          <option value='"Nanum Myeongjo"' data-w="800">나눔명조 — 고대비</option>
-          <option value='"Gowun Batang"' data-w="700">고운바탕 — 소프트 명조</option>
-          <option value='"Song Myung"' data-w="400">송명 — 고전 명조</option>
-          <option value='"Hahmlet"' data-w="900">함렛 — 가변 세리프</option>
+          <option value='"Nanum Myeongjo"' data-w="800">나눔명조</option>
+          <option value='"Gowun Batang"' data-w="700">고운바탕</option>
+          <option value='"Song Myung"' data-w="400">송명</option>
+          <option value='"Hahmlet"' data-w="900">함렛</option>
           <option value='"Diphylleia"' data-w="400">디필레이아</option>
         </optgroup>
         <optgroup label="디스플레이 — 타입이 주인공">
-          <option value='"Black Han Sans"' data-w="400">블랙한산스 — 초헤비</option>
-          <option value='"Do Hyeon"' data-w="400">도현 — 굵은 고딕</option>
-          <option value='"Jua"' data-w="400">주아 — 둥근</option>
+          <option value='"Black Han Sans"' data-w="400">블랙한산스</option>
+          <option value='"Do Hyeon"' data-w="400">도현</option>
+          <option value='"Jua"' data-w="400">주아</option>
           <option value='"Bagel Fat One"' data-w="400">베이글 팻</option>
           <option value='"Moirai One"' data-w="400">모이라이</option>
           <option value='"Grandiflora One"' data-w="400">그랜디플로라</option>
@@ -486,21 +489,22 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
           <option value='"East Sea Dokdo"' data-w="400">동해독도</option>
         </optgroup>
 
+        <option class="fdiv" disabled>───────────  영문  ───────────</option>
         <optgroup label="영문 · 그로테스크 — 둥근 산세리프">
-          <option value='"Bricolage Grotesque"' data-w="800">Bricolage Grotesque — 가변 4축</option>
+          <option value='"Bricolage Grotesque"' data-w="800">Bricolage Grotesque</option>
           <option value='"Hanken Grotesk"' data-w="800">Hanken Grotesk</option>
           <option value='"Space Grotesk"' data-w="700">Space Grotesk</option>
           <option value='"Funnel Display"' data-w="800">Funnel Display</option>
           <option value='"Outfit"' data-w="900">Outfit</option>
           <option value='"Plus Jakarta Sans"' data-w="800">Plus Jakarta Sans</option>
           <option value='"Manrope"' data-w="800">Manrope</option>
-          <option value='"Anybody"' data-w="900">Anybody — 폭 가변</option>
+          <option value='"Anybody"' data-w="900">Anybody</option>
           <option value='"Inter"' data-w="900">Inter</option>
         </optgroup>
         <optgroup label="영문 · 에디토리얼 세리프">
-          <option value='"Fraunces"' data-w="900">Fraunces — 표현형 가변</option>
+          <option value='"Fraunces"' data-w="900">Fraunces</option>
           <option value='"Instrument Serif"' data-w="400">Instrument Serif</option>
-          <option value='"Bodoni Moda"' data-w="900">Bodoni Moda — 고대비</option>
+          <option value='"Bodoni Moda"' data-w="900">Bodoni Moda</option>
           <option value='"Playfair Display"' data-w="900">Playfair Display</option>
           <option value='"Cormorant Garamond"' data-w="700">Cormorant Garamond</option>
           <option value='"Crimson Pro"' data-w="700">Crimson Pro</option>
@@ -523,8 +527,8 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
           <option value='"Sigmar"' data-w="400">Sigmar</option>
           <option value='"Lilita One"' data-w="400">Lilita One</option>
           <option value='"Rubik Bubbles"' data-w="400">Rubik Bubbles</option>
-          <option value='"Press Start 2P"' data-w="400">Press Start 2P — 픽셀</option>
-          <option value='"VT323"' data-w="400">VT323 — CRT</option>
+          <option value='"Press Start 2P"' data-w="400">Press Start 2P</option>
+          <option value='"VT323"' data-w="400">VT323</option>
         </optgroup>
         <optgroup label="영문 · 사이버펑크">
           <option value='"Orbitron"' data-w="900">Orbitron</option>
@@ -547,12 +551,12 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
           <option value='"Pathway Gothic One"' data-w="400">Pathway Gothic One</option>
         </optgroup>
         <optgroup label="영문 · 확장 · 기하학 가변">
-          <option value='"Syne"' data-w="800">Syne — 실험형</option>
-          <option value='"Unbounded"' data-w="900">Unbounded — 와이드</option>
+          <option value='"Syne"' data-w="800">Syne</option>
+          <option value='"Unbounded"' data-w="900">Unbounded</option>
           <option value='"Gabarito"' data-w="900">Gabarito</option>
           <option value='"Familjen Grotesk"' data-w="700">Familjen Grotesk</option>
-          <option value='"Darker Grotesque"' data-w="900">Darker Grotesque — 초압축</option>
-          <option value='"Recursive"' data-w="900">Recursive — 가변 5축</option>
+          <option value='"Darker Grotesque"' data-w="900">Darker Grotesque</option>
+          <option value='"Recursive"' data-w="900">Recursive</option>
           <option value='"Mona Sans"' data-w="900">Mona Sans</option>
           <option value='"Geist"' data-w="900">Geist</option>
           <option value='"Sora"' data-w="800">Sora</option>
@@ -572,15 +576,15 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         <optgroup label="영문 · 글리치 · 픽셀 · 3D">
           <option value='"Rubik Glitch"' data-w="400">Rubik Glitch</option>
           <option value='"Rubik Vinyl"' data-w="400">Rubik Vinyl</option>
-          <option value='"Rubik Iso"' data-w="400">Rubik Iso — 아이소메트릭</option>
+          <option value='"Rubik Iso"' data-w="400">Rubik Iso</option>
           <option value='"Rubik Moonrocks"' data-w="400">Rubik Moonrocks</option>
           <option value='"Rubik Wet Paint"' data-w="400">Rubik Wet Paint</option>
           <option value='"Bungee Shade"' data-w="400">Bungee Shade</option>
           <option value='"Bungee Spice"' data-w="400">Bungee Spice</option>
           <option value='"Monoton"' data-w="400">Monoton</option>
-          <option value='"Nabla"' data-w="400">Nabla — 3D 컬러</option>
-          <option value='"Climate Crisis"' data-w="400">Climate Crisis — 가변</option>
-          <option value='"Doto"' data-w="900">Doto — 도트</option>
+          <option value='"Nabla"' data-w="400">Nabla</option>
+          <option value='"Climate Crisis"' data-w="400">Climate Crisis</option>
+          <option value='"Doto"' data-w="900">Doto</option>
           <option value='"Pixelify Sans"' data-w="700">Pixelify Sans</option>
           <option value='"Silkscreen"' data-w="400">Silkscreen</option>
           <option value='"Sixtyfour"' data-w="400">Sixtyfour</option>
@@ -591,8 +595,8 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         <optgroup label="영문 · 헤리티지 · 블랙레터">
           <option value='"UnifrakturMaguntia"' data-w="400">UnifrakturMaguntia</option>
           <option value='"Grenze Gotisch"' data-w="900">Grenze Gotisch</option>
-          <option value='"Rye"' data-w="400">Rye — 웨스턴</option>
-          <option value='"Codystar"' data-w="400">Codystar — 전구</option>
+          <option value='"Rye"' data-w="400">Rye</option>
+          <option value='"Codystar"' data-w="400">Codystar</option>
         </optgroup>
         <optgroup label="영문 · 손글씨 — 반(反)AI">
           <option value='"Caveat"' data-w="700">Caveat</option>
@@ -1418,6 +1422,14 @@ function mixPool(refs, base) {
      그대로 두면 서브·추가는 메인 설정을 따라간다. */
   $('#fontSub').innerHTML = $('#font').innerHTML;
   $('#fontExtra').innerHTML = $('#font').innerHTML;
+  /* 목록의 각 항목을 그 글꼴로 그린다. 이름을 읽는 대신 생김새를 보고 고른다.
+     화면에 보이는 것만 내려받히므로 121종을 한꺼번에 받지는 않는다. */
+  for (const sel of ['#font', '#fontSub', '#fontExtra']) {
+    const el = $(sel);
+    if (!el || !el.options) continue;
+    for (const o of Array.from(el.options))
+      if (o.value) o.style.fontFamily = o.value + ', sans-serif';
+  }
   for (const s of ['#fontSub', '#fontExtra'])
     $(s).addEventListener('change', async () => { await loadFont(); drawPreview(); });
   const ROLE = { ink: 'main', inkSub: 'sub', inkExtra: 'extra' };
