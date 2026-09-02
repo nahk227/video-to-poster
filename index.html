@@ -319,6 +319,13 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
   padding:.5rem 2.3rem .5rem .7rem;
   background-position:calc(100% - 18px) 55%,calc(100% - 12px) 55%;
   background-size:6px 6px,6px 6px}
+/* 색 드롭다운 옆의 색 선택기 — 프리셋 밖의 색을 집는다 */
+.ink-row{display:flex;align-items:stretch;gap:.35rem;min-width:0}
+.ink-row select{flex:1 1 auto;min-width:0}
+.ink-pick{flex:none;width:2.6rem;padding:2px;cursor:pointer;
+  border:1px solid var(--ink);background:transparent;border-radius:0}
+.ink-pick::-webkit-color-swatch-wrapper{padding:0}
+.ink-pick::-webkit-color-swatch{border:none}
 </style>
 
 <div class="wrap">
@@ -574,7 +581,7 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         </optgroup>
       </select>
         
-        <select id="ink">
+        <span class="ink-row"><select id="ink">
           <option value="">색</option>
         <option value="auto">자동 — 배경 보고 결정</option>
         <option value="#F2EFE8">페이퍼 화이트</option>
@@ -584,7 +591,8 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         <option value="#B0904F">골드</option>
         <option value="#C0392B">레드</option>
         <option value="#2255CC">블루</option>
-      </select>
+      </select><input type="color" class="ink-pick" id="inkPick" value="#161A0D"
+                 title="메인 카피 색 직접 고르기" aria-label="메인 카피 색 직접 고르기"></span>
       </div>
     </div>
 
@@ -595,7 +603,8 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         
           <select id="fontSub" aria-label="서브 카피 글꼴"></select>
         
-          <select id="inkSub" aria-label="서브 카피 색"></select>
+          <span class="ink-row"><select id="inkSub" aria-label="서브 카피 색"></select><input type="color" class="ink-pick" id="inkSubPick" value="#161A0D"
+                 title="서브 카피 색 직접 고르기" aria-label="서브 카피 색 직접 고르기"></span>
       </div>
     </div>
 
@@ -607,7 +616,8 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         
           <select id="fontExtra" aria-label="추가 정보 글꼴"></select>
         
-          <select id="inkExtra" aria-label="추가 정보 색"></select>
+          <span class="ink-row"><select id="inkExtra" aria-label="추가 정보 색"></select><input type="color" class="ink-pick" id="inkExtraPick" value="#161A0D"
+                 title="추가 정보 색 직접 고르기" aria-label="추가 정보 색 직접 고르기"></span>
       </div>
     </div>
   </div>
@@ -785,8 +795,15 @@ async function loadFont() {
 
 /* 역할별 글자 색. 비워두면 메인을 따라간다. */
 let INKS = { main: 'auto', sub: '', extra: '' };
+/* 직접 고른 색. 드롭다운을 다시 만지면 지워진다 — 마지막에 만진 쪽이 이긴다. */
+let CUSTOM = { main: null, sub: null, extra: null };
+
 function readInks() {
-  INKS = { main: $('#ink').value, sub: $('#inkSub').value, extra: $('#inkExtra').value };
+  INKS = {
+    main: CUSTOM.main || $('#ink').value,
+    sub: CUSTOM.sub || $('#inkSub').value,
+    extra: CUSTOM.extra || $('#inkExtra').value,
+  };
   INK = INKS.main;
 }
 
@@ -1371,8 +1388,17 @@ function mixPool(refs, base) {
   $('#inkExtra').innerHTML = $('#ink').innerHTML;
   for (const s of ['#fontSub', '#fontExtra'])
     $(s).addEventListener('change', async () => { await loadFont(); drawPreview(); });
-  for (const s of ['#ink', '#inkSub', '#inkExtra'])
-    $(s).addEventListener('change', () => { readInks(); queuePreview(); });
+  const ROLE = { ink: 'main', inkSub: 'sub', inkExtra: 'extra' };
+  for (const id of ['ink', 'inkSub', 'inkExtra']) {
+    $('#' + id).addEventListener('change', () => {
+      CUSTOM[ROLE[id]] = null;            // 목록에서 골랐으면 직접 고른 색은 버린다
+      readInks(); queuePreview();
+    });
+    $('#' + id + 'Pick').addEventListener('input', () => {
+      CUSTOM[ROLE[id]] = $('#' + id + 'Pick').value;
+      readInks(); queuePreview();
+    });
+  }
   readInks();
 })();
 
@@ -2086,8 +2112,10 @@ function render(frame, L, concept, mainText, subText, W, H, field, edit = PV_EDI
     const ss = Math.max(8, Math.round(f.size / 4 * SCALE.sub));
     const sf = FONTS.sub;
     ctx.font = `${sf.weight} ${ss}px ${sf.family}`;
+    /* 색을 따로 골랐으면 그 색 그대로 찍는다. 메인을 따라갈 때만 살짝 눌러
+       메인·서브의 위계를 남긴다. */
     const si = inkOf('sub');
-    ctx.fillStyle = `rgba(${si[0]|0},${si[1]|0},${si[2]|0},.9)`;
+    ctx.fillStyle = `rgba(${si[0]|0},${si[1]|0},${si[2]|0},${INKS.sub ? 1 : .9})`;
     const sw2 = ctx.measureText(subText).width;
     const sx = (L.align === 'center' ? mx*W + (boxW - sw2)/2 : mx*W) + NUDGE.sub[0]*W;
     const sy = y + ss * 0.8 + NUDGE.sub[1]*H;
@@ -2116,7 +2144,7 @@ function render(frame, L, concept, mainText, subText, W, H, field, edit = PV_EDI
     const ef = FONTS.extra;
     ctx.font = `${ef.weight} ${es}px ${ef.family}`;
     const ei = inkOf('extra');
-    ctx.fillStyle = `rgba(${ei[0]|0},${ei[1]|0},${ei[2]|0},.85)`;
+    ctx.fillStyle = `rgba(${ei[0]|0},${ei[1]|0},${ei[2]|0},${INKS.extra ? 1 : .85})`;
     let ey = flowY + es * 1.9;
     for (const line of EXTRA) {
       const ew = ctx.measureText(line).width;
