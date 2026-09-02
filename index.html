@@ -749,11 +749,11 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
       <path d="M8 2v7m0 0 3-3m-3 3L5 6M2.5 11.5v2h11v-2"/></svg></button>
     <button class="ghost" id="lbPdf">PDF<svg class="dl" viewBox="0 0 16 16" aria-hidden="true">
       <path d="M8 2v7m0 0 3-3m-3 3L5 6M2.5 11.5v2h11v-2"/></svg></button>
-    <button class="ghost" id="lbInsta">INSTA<svg class="dl" viewBox="0 0 16 16" aria-hidden="true">
-      <path d="M8 2v7m0 0 3-3m-3 3L5 6M2.5 11.5v2h11v-2"/></svg></button>
     <a class="ghost lb-go" id="lbInstaGo" href="https://www.instagram.com/joseonlab"
-       target="_blank" rel="noopener">@joseonlab<svg class="dl" viewBox="0 0 16 16"
-       aria-hidden="true"><path d="M6 3h7v7M13 3 6.5 9.5M11 10v3.5H2.5V5H6"/></svg></a>
+       target="_blank" rel="noopener"
+       title="인스타 규격으로 저장하고 @joseonlab 을 엽니다">@joseonlab<svg class="dl"
+       viewBox="0 0 16 16" aria-hidden="true">
+       <path d="M8 2v7m0 0 3-3m-3 3L5 6M2.5 11.5v2h11v-2"/></svg></a>
     <button class="ghost" id="lbReset">이 장 편집 취소</button>
     <button class="ghost" id="lbClose">닫기</button>
   </div>
@@ -1959,6 +1959,26 @@ function drawScribble(ctx, W, H, color, seed) {
   ctx.restore();
 }
 
+/* ── 참조 배치 ─────────────────────────────────────────────────────
+   실제 포스터 6장을 재어 얻은 짜임새다. 그림은 가져오지 않는다 —
+   글자가 앉은 자리·폭·높이·정렬과 색면 영역만 숫자로 옮겼다.
+   남의 작업을 재배포하지 않으면서 구조만 빌리는 방법이고,
+   명세의 references 원칙(measurements only, no images)과 같다. */
+const REF_LAYOUTS = [
+  { id:'참조 · 하단 가운데 중간 색면', concepts:'ABC', band:[0,0.562,1,0.438],
+    main:[0.232,0.622,0.536], sizeH:0.144, size:0.132, lead:1.08, track:-.03, align:'center' },
+  { id:'참조 · 상단 왼쪽 대형 사진', concepts:'ABC', band:null,
+    main:[0.005,0.003,0.92], sizeH:0.300, size:0.220, lead:1.08, track:-.03, align:'left' },
+  { id:'참조 · 하단 왼쪽 중간 사진', concepts:'ABC', band:null,
+    main:[0.023,0.621,0.818], sizeH:0.144, size:0.132, lead:1.08, track:-.03, align:'left' },
+  { id:'참조 · 하단 가운데 중간 색면', concepts:'ABC', band:[0,0.561,1,0.439],
+    main:[0.135,0.621,0.805], sizeH:0.143, size:0.132, lead:1.08, track:-.03, align:'center' },
+  { id:'참조 · 상단 왼쪽 중간 사진', concepts:'ABC', band:null,
+    main:[0.031,0.149,0.909], sizeH:0.127, size:0.117, lead:1.08, track:-.03, align:'left' },
+  { id:'참조 · 하단 가운데 중간 사진', concepts:'ABC', band:null,
+    main:[0.076,0.631,0.864], sizeH:0.143, size:0.132, lead:1.08, track:-.03, align:'center' }
+];
+
 /* 배치 — 각 안이 서로 다른 구조를 쓴다 */
 const LAYOUTS = [
   { id:'색면 분할',      concepts:'AB', band:[0,.62,1,.38], main:[.075,.668,.85], size:.14,  lead:1.10, track:-.03, align:'left' },
@@ -1971,7 +1991,8 @@ const LAYOUTS = [
   { id:'자유 비대칭',    concepts:'AB', band:null,          main:[.17,.32,.70],   size:.105, lead:1.12, track:-.02, align:'left' },
   { id:'풀블리드',       concepts:'A',  band:null,          main:null,            size:0,    lead:1,    track:0,   align:'left' },
   { id:'판형',           concepts:'A',  plate:[.09,.075,.82,.70], main:null,      size:0,    lead:1,    track:0,   align:'left' },
-  ...ARCHETYPES
+  ...ARCHETYPES,
+  ...REF_LAYOUTS
 ];
 const TONE = { A:{mult:.85,zoom:1.0}, B:{mult:1.05,zoom:1.10}, C:{mult:1.35,zoom:1.35} };
 
@@ -2556,7 +2577,10 @@ function instaCanvas(src) {
   return c;
 }
 
-$('#lbInsta').onclick = async () => {
+/* @joseonlab 을 누르면 인스타 규격으로 저장하면서 계정을 새 탭으로 연다.
+   막지 않고 흘려보내므로 링크 이동은 그대로 일어난다. 게시물 자동 등록은
+   인스타 정책상 브라우저만으로는 불가능하다 — 아래 주석 참고. */
+$('#lbInstaGo').addEventListener('click', async () => {
   const p = posters[lbIndex];
   if (!p) return;
   const say = m => { $('#lbNote').textContent = m; };
@@ -2580,14 +2604,11 @@ $('#lbInsta').onclick = async () => {
   if (!dl) { say('이 화면에서는 저장을 쓸 수 없습니다.'); return; }
   try {
     await dl.save({ filename: name, data: blob });
-    say(`인스타 규격 ${c.width}×${c.height} 로 저장했습니다 — @joseonlab 에서 올리세요.`);
-    /* 계정 페이지를 바로 띄워 준다. 막히면 옆의 링크가 남아 있다. */
-    try { window.open('https://www.instagram.com/joseonlab', '_blank', 'noopener'); }
-    catch (_) { /* 새 창이 막힌 환경이면 링크를 누르면 된다 */ }
+    say(`인스타 규격 ${c.width}×${c.height} 로 저장했습니다. 열린 탭에서 올리세요.`);
   } catch (e) {
     say((e && e.code) === 'declined' ? '저장을 취소했습니다.' : '저장하지 못했습니다.');
   }
-};
+});
 
 $('#pdfAll').onclick = () => savePdf(posters, 'SCENE_posters.pdf');
 $('#lbPdf').onclick = () => {
