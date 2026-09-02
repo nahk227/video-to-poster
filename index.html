@@ -326,15 +326,19 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
   border:1px solid var(--ink);background:transparent;border-radius:0}
 .ink-pick::-webkit-color-swatch-wrapper{padding:0}
 .ink-pick::-webkit-color-swatch{border:none}
-/* 색 — 이름표 옆의 무지개 테 선택기. 고르면 × 가 나타나 자동으로 되돌릴 수 있다. */
+/* 색 — 무지개 바를 누르면 색상환이 열린다.
+   <input type=color> 는 제 스와치로 요소 전체를 덮으므로, 무지개는 감싸는 요소가
+   그리고 선택기는 그 위에 투명하게 얹는다. 고른 색은 오른쪽 작은 원으로 보여준다. */
 .ink-lbl{flex:none;font-size:.88rem;font-weight:700;color:var(--soft)}
-.ink-pick{flex:1 1 auto;min-width:0;height:2.1rem;padding:3px;cursor:pointer;
-  border:none;border-radius:0;background:
-    linear-gradient(90deg,#e33,#ec0,#5c3,#2ad,#63c,#e39,#e33);
-  box-shadow:inset 0 0 0 3px rgba(255,255,255,.55)}
-.ink-pick::-webkit-color-swatch-wrapper{padding:0}
-.ink-pick::-webkit-color-swatch{border:1px solid rgba(0,0,0,.35)}
-.ink-pick::-moz-color-swatch{border:1px solid rgba(0,0,0,.35)}
+.ink-bar{position:relative;flex:1 1 auto;min-width:0;height:2.1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:flex-end;padding:0 .3rem;
+  border:1px solid var(--ink);
+  background:linear-gradient(90deg,#e5352b 0%,#f0821f 15%,#f6d423 30%,
+    #3fae4a 45%,#2b8fd6 60%,#3a3fa6 75%,#8e3fa8 90%,#e5352b 100%)}
+.ink-bar input[type=color]{position:absolute;inset:0;width:100%;height:100%;
+  opacity:0;cursor:pointer;border:none;padding:0;margin:0}
+.ink-dot{width:1.35rem;height:1.35rem;border-radius:50%;border:2px solid #fff;
+  box-shadow:0 0 0 1px rgba(0,0,0,.45);background:#161A0D;pointer-events:none}
 .ink-auto{flex:none;width:1.8rem;height:2.1rem;padding:0;cursor:pointer;line-height:1;
   border:1px solid var(--line);background:transparent;color:var(--soft);
   font:inherit;font-weight:700}
@@ -596,8 +600,11 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         
         <span class="ink-row">
           <span class="ink-lbl">색</span>
-          <input type="color" class="ink-pick" id="inkPick" value="#161A0D"
-                 title="메인 카피 색 고르기" aria-label="메인 카피 색">
+          <label class="ink-bar">
+            <input type="color" id="inkPick" value="#161A0D"
+                   aria-label="글자 색 고르기">
+            <span class="ink-dot" id="inkDot" hidden></span>
+          </label>
           <button type="button" class="ink-auto" id="inkAuto" hidden
                   title="자동으로 되돌리기">&times;</button>
         </span>
@@ -613,8 +620,11 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         
           <span class="ink-row">
           <span class="ink-lbl">색</span>
-          <input type="color" class="ink-pick" id="inkSubPick" value="#161A0D"
-                 title="서브 카피 색 고르기" aria-label="서브 카피 색">
+          <label class="ink-bar">
+            <input type="color" id="inkSubPick" value="#161A0D"
+                   aria-label="글자 색 고르기">
+            <span class="ink-dot" id="inkSubDot" hidden></span>
+          </label>
           <button type="button" class="ink-auto" id="inkSubAuto" hidden
                   title="자동으로 되돌리기">&times;</button>
         </span>
@@ -631,8 +641,11 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
         
           <span class="ink-row">
           <span class="ink-lbl">색</span>
-          <input type="color" class="ink-pick" id="inkExtraPick" value="#161A0D"
-                 title="추가 정보 색 고르기" aria-label="추가 정보 색">
+          <label class="ink-bar">
+            <input type="color" id="inkExtraPick" value="#161A0D"
+                   aria-label="글자 색 고르기">
+            <span class="ink-dot" id="inkExtraDot" hidden></span>
+          </label>
           <button type="button" class="ink-auto" id="inkExtraAuto" hidden
                   title="자동으로 되돌리기">&times;</button>
         </span>
@@ -1408,14 +1421,17 @@ function mixPool(refs, base) {
     $(s).addEventListener('change', async () => { await loadFont(); drawPreview(); });
   const ROLE = { ink: 'main', inkSub: 'sub', inkExtra: 'extra' };
   for (const id of ['ink', 'inkSub', 'inkExtra']) {
-    const pick = $('#' + id + 'Pick'), auto = $('#' + id + 'Auto');
+    const pick = $('#' + id + 'Pick'), auto = $('#' + id + 'Auto'), dot = $('#' + id + 'Dot');
     pick.addEventListener('input', () => {
       CUSTOM[ROLE[id]] = pick.value;
+      dot.style.background = pick.value;
+      dot.hidden = false;
       auto.hidden = false;
       readInks(); queuePreview();
     });
     auto.addEventListener('click', () => {
       CUSTOM[ROLE[id]] = null;            // 자동으로 되돌린다
+      dot.hidden = true;
       auto.hidden = true;
       readInks(); queuePreview();
     });
