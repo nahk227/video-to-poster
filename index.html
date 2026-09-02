@@ -294,6 +294,16 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
 .lightbox .lb-actions{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
 .lb-note{margin:0;min-height:1.2em;color:var(--ground);opacity:.85;font-size:.82rem;
   text-align:center}
+/* 내려받기 표시 — 글자 색을 그대로 따라가므로 버튼 종류를 안 가린다 */
+.lightbox .lb-actions button,.lightbox .lb-actions .lb-go{
+  display:inline-flex;align-items:center;gap:.42em}
+/* 계정으로 건너가는 링크 — 버튼과 같은 옷을 입되 글자는 링크임을 드러낸다 */
+.lb-go{border:1px solid var(--ground);background:transparent;color:var(--ground);
+  font:inherit;font-weight:700;padding:.7rem 1.3rem;text-decoration:none;
+  letter-spacing:-.01em}
+.lb-go:hover{background:rgba(186,217,79,.16)}
+.dl{width:1em;height:1em;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;
+  stroke-linecap:round;stroke-linejoin:round}
 .lightbox button{border-color:var(--ground);background:var(--ground);color:var(--ink)}
 .lightbox button.ghost{background:transparent;color:var(--ground)}
 .lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:none;
@@ -703,9 +713,15 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
     </div>
   </div>
   <div class="lb-actions">
-    <button id="lbSave">PNG 저장</button>
-    <button class="ghost" id="lbPdf">PDF 저장</button>
-    <button class="ghost" id="lbInsta">인스타</button>
+    <button id="lbSave">PNG<svg class="dl" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M8 2v7m0 0 3-3m-3 3L5 6M2.5 11.5v2h11v-2"/></svg></button>
+    <button class="ghost" id="lbPdf">PDF<svg class="dl" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M8 2v7m0 0 3-3m-3 3L5 6M2.5 11.5v2h11v-2"/></svg></button>
+    <button class="ghost" id="lbInsta">INSTA<svg class="dl" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M8 2v7m0 0 3-3m-3 3L5 6M2.5 11.5v2h11v-2"/></svg></button>
+    <a class="ghost lb-go" id="lbInstaGo" href="https://www.instagram.com/joseonlab"
+       target="_blank" rel="noopener">@joseonlab<svg class="dl" viewBox="0 0 16 16"
+       aria-hidden="true"><path d="M6 3h7v7M13 3 6.5 9.5M11 10v3.5H2.5V5H6"/></svg></a>
     <button class="ghost" id="lbReset">이 장 편집 취소</button>
     <button class="ghost" id="lbClose">닫기</button>
   </div>
@@ -2488,7 +2504,10 @@ $('#lbInsta').onclick = async () => {
   if (!dl) { say('이 화면에서는 저장을 쓸 수 없습니다.'); return; }
   try {
     await dl.save({ filename: name, data: blob });
-    say(`인스타 규격 ${c.width}×${c.height} 로 저장했습니다. 그대로 올리면 됩니다.`);
+    say(`인스타 규격 ${c.width}×${c.height} 로 저장했습니다 — @joseonlab 에서 올리세요.`);
+    /* 계정 페이지를 바로 띄워 준다. 막히면 옆의 링크가 남아 있다. */
+    try { window.open('https://www.instagram.com/joseonlab', '_blank', 'noopener'); }
+    catch (_) { /* 새 창이 막힌 환경이면 링크를 누르면 된다 */ }
   } catch (e) {
     say((e && e.code) === 'declined' ? '저장을 취소했습니다.' : '저장하지 못했습니다.');
   }
