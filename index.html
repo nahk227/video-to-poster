@@ -307,6 +307,11 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
 .lb-prev{left:.2rem} .lb-next{right:.2rem}
 @media(max-width:640px){.lb-nav{font-size:1.8rem;padding:.4rem .6rem}}
 
+/* 메뉴 이름은 모두 대문자로. 대문자는 자간을 조금 벌려야 답답하지 않다.
+   한글은 대소문자가 없어 그대로 남는다. */
+.field>label,.typeset>label,.logo-head>label,.ref-head>label{
+  text-transform:uppercase;letter-spacing:.04em}
+
 /* ── 드롭다운 크기 통일 ─────────────────────────────────────────
    메인·서브·추가 카드의 글꼴/색, 로고 위치, 안당 장수 — 여섯 개를 똑같이.
    스타일시트 맨 끝에 두어 앞선 어떤 규칙에도 덮이지 않게 한다.
@@ -672,7 +677,7 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
       <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp" hidden>
     </div>
     <div class="typeset countfield">
-      <div class="logo-head"><label for="count">몇 장?</label></div>
+      <div class="logo-head"><label for="count">Count</label></div>
       <select id="count">
         <option value="4">4장</option>
         <option value="6" selected>6장</option>
