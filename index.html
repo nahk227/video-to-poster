@@ -229,7 +229,10 @@ select:focus,select:focus-visible{outline:3px solid var(--ink);outline-offset:2p
   border-color:var(--ink);background-color:var(--pick);color:var(--pick-ink)}
 option{background:var(--pick);color:var(--pick-ink)}
 option:checked,option:hover{background:var(--pick-on);color:var(--pick-on-ink)}
-optgroup{background:var(--pick);color:var(--pick-ink);font-style:normal;font-weight:700}
+/* 그룹 이름만 눈에 띄게 한다. 항목은 각자의 글꼴 그대로 두어야 굵기·표정이 보인다 —
+   전부 강조하면 강조가 사라지고 미리보기도 망가진다. */
+optgroup{background:var(--pick);color:#8A2A1F;font-style:normal;font-weight:900;
+  font-family:var(--kr);letter-spacing:.02em}
 .hint{font-size:.82rem;color:var(--soft)}
 .ratios{display:flex;flex-wrap:wrap;gap:.5rem}
 .chip{border:1px solid var(--ink);padding:.42rem .85rem;font-size:.95rem;
@@ -349,8 +352,8 @@ video:not(.dropbg){display:none}   /* 배경 영상만 예외 */
   font:inherit;font-weight:700}
 .ink-auto:hover{background:rgba(0,0,0,.07);color:var(--ink);border-color:var(--ink)}
 /* 한글과 영문을 가르는 줄 — 고를 수 없는 항목이다 */
-option.fdiv{font-weight:800;letter-spacing:.08em;text-align:center;
-  background:var(--pick-on);color:var(--pick-ink);font-family:var(--mono)}
+option.fdiv{font-weight:900;letter-spacing:.1em;text-align:center;
+  background:var(--pick-on);color:#8A2A1F;font-family:var(--mono)}
 </style>
 
 <div class="wrap">
