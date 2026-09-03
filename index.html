@@ -152,8 +152,10 @@ input[type=file]{display:none}
 @keyframes refplay{from{background-position:0% 50%}to{background-position:100% 50%}}
 @media (prefers-reduced-motion:reduce){.refbg{animation:none}}
 .refbox>*:not(.refbg){position:relative;z-index:2}
-.refbox .ref-head>label,.refbox .ref-head .chk,.refbox>.hint{
-  text-shadow:0 1px 3px rgba(255,255,255,.95),0 0 10px rgba(255,255,255,.85)}
+/* 영상 위에 얹히는 글자다. 밝은 하늘과 어두운 구름이 번갈아 지나가므로
+   흰 글씨에 어두운 그림자가 어느 장면에서나 읽힌다. */
+.refbox .ref-head>label,.refbox>.hint{
+  color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.75),0 0 14px rgba(0,0,0,.55)}
 .refdrop{background:#cde38b}          /* 점선 상자는 원래 모습 그대로 유지 */
 .refbox{display:flex;flex-direction:column;gap:.85rem;padding:1.25rem 1.3rem;
   border:none;background:transparent}
@@ -164,8 +166,8 @@ input[type=file]{display:none}
   font-weight:700}
 .refdrop{border:2px dashed #fff;padding:1.1rem 1rem;text-align:center;cursor:pointer;
   font-size:.88rem;font-weight:600;color:var(--soft);transition:background .12s}
-.refdrop:hover,.refdrop.hot{background:rgba(255,255,255,.35);border-style:solid;
-  color:var(--ink)}
+/* 뒤가 영상이라 반투명으로 두면 비쳐서 글씨가 안 읽힌다 — 올렸을 때도 불투명하게 */
+.refdrop:hover,.refdrop.hot{background:#e7ffc0;border-style:solid;color:var(--ink)}
 .refs{display:flex;flex-wrap:wrap;gap:.6rem}
 .refcard{position:relative;width:104px;display:flex;flex-direction:column;gap:.25rem}
 .refcard img{width:100%;height:auto;display:block;border:1px solid var(--line)}
