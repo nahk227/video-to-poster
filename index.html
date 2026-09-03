@@ -194,6 +194,11 @@ input[type=file]{display:none}
 .logo-row .chk{display:inline-flex;align-items:center;gap:.22rem;font-size:.78rem;
   font-weight:600;white-space:nowrap;flex:none}
 .logofield .hint{margin-top:.35rem}
+/* 맨 윗줄도 아래 카드들과 같은 3단 눈금을 쓴다 — 항목이 둘뿐이라
+   내버려 두면 배경 색 팔레트가 절반 폭까지 늘어난다. */
+.grid.toprow{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}
+@media (max-width:860px){.grid.toprow{grid-template-columns:1fr}}
+
 /* 로고와 안당 장수도 위의 카피 카드와 똑같은 상자·너비를 쓴다.
    세 칸짜리 격자의 앞 두 칸을 차지하므로 위 카드와 세로선이 맞는다. */
 .grid.logorow{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch}
@@ -435,7 +440,7 @@ option.fdiv{font-weight:900;letter-spacing:.1em;text-align:center;
   </div>
   <input type="file" id="file" accept="video/*">
 
-  <div class="grid">
+  <div class="grid toprow">
     <div class="field">
       <label>Ratio</label>
       <div class="ratios" id="ratios">
